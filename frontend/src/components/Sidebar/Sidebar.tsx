@@ -26,6 +26,8 @@ import type { Channel } from '@/lib/types';
 import { getChannels } from '@/lib/api';
 import type { AuthUser } from '@/lib/api';
 import { useMobileStore } from '@/stores/useMobileStore';
+import { useDarkMode } from '@/hooks/useDarkMode';
+import { Moon, Sun } from 'lucide-react';
 // HuddleBar moved to global render in App.tsx
 
 const navItems = [
@@ -41,6 +43,7 @@ export function Sidebar() {
   const { user, logout } = useAuthStore();
   const { openProfile } = useProfileStore();
   const closeSidebar = useMobileStore((s) => s.closeSidebar);
+  const { isDark, toggle } = useDarkMode();
   const [channelsExpanded, setChannelsExpanded] = useState(true);
   const [dmsExpanded, setDmsExpanded] = useState(true);
   const activeNav = location.pathname === '/files' ? 'files' : location.pathname === '/later' ? 'later' : location.pathname === '/admin' ? 'admin' : 'dms';
@@ -232,11 +235,15 @@ export function Sidebar() {
               />
             </button>
             {showAvatarMenu && (
-              <div className="absolute bottom-10 left-0 z-50 w-48 rounded-lg border border-slack-border bg-white py-1 shadow-lg">
+              <div className="absolute bottom-10 left-0 z-50 w-48 rounded-lg border border-slack-border dark:border-[#3d3f42] bg-white dark:bg-[#222529] py-1 shadow-lg">
                 <div className="px-4 py-2 border-b border-slack-border-light">
                   <p className="text-sm font-medium text-slack-primary">{user.name}</p>
                   <p className="text-xs text-slack-hint">{user.email}</p>
                 </div>
+		<Button variant="menu-item" onClick={() => { toggle(); setShowAvatarMenu(false); }}>
+		   {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+		   {isDark ? 'Light mode' : 'Dark mode'}
+		</Button>
                 <Button variant="menu-item" onClick={() => { setShowAvatarMenu(false); openProfile(); }}>
                   <User className="h-4 w-4" />
                   Profile

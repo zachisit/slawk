@@ -57,7 +57,7 @@ export function MessageArea() {
 
   if (!activeChannel) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center text-slack-hint">
+      <div className="flex flex-1 flex-col items-center justify-center text-slack-hint dark:bg-[#1a1d21]">
         <button
           onClick={useMobileStore.getState().openSidebar}
           className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-slack-hover md:hidden"
@@ -107,8 +107,8 @@ export function MessageArea() {
         />
         <MessageList channelId={activeChannelId!} onOpenThread={handleOpenThread} readOnly={readOnly} />
         {readOnly ? (
-          <div className="px-5 pb-4 pt-3 bg-white border-t border-slack-border">
-            <div className="flex items-center justify-center gap-3 rounded-lg border border-slack-border p-4">
+          <div className="px-5 pb-4 pt-3 bg-white dark:bg-[#1a1d21] border-t border-slack-border dark:border-[#3d3f42]">
+            <div className="flex items-center justify-center gap-3 rounded-lg border border-slack-border dark:border-[#3d3f42] p-4">
               <Hash className="h-4 w-4 text-slack-secondary" />
               <span className="text-[15px] text-slack-secondary">You're viewing <b>#{activeChannel.name}</b></span>
               <button

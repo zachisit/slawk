@@ -76,7 +76,7 @@ export function MessageHeader({ channel, showMembers, onToggleMembers, onToggleP
   };
 
   return (
-    <header className="flex flex-col flex-shrink-0 border-b border-slack-border bg-white pt-[env(safe-area-inset-top)]">
+    <header className="flex flex-col flex-shrink-0 border-b border-slack-border bg-white dark:bg-[#1a1d21] dark:border-[#3d3f42] pt-[env(safe-area-inset-top)]">
       {/* Top Row - Channel name and actions */}
       <div className="flex h-[49px] items-center justify-between px-4">
         {/* Left Section */}
@@ -153,7 +153,7 @@ export function MessageHeader({ channel, showMembers, onToggleMembers, onToggleP
                 <MoreVertical className="h-4 w-4 text-slack-secondary" />
               </Button>
               {showMenu && (
-                <div className="absolute right-0 top-7 z-50 min-w-[160px] rounded-lg border border-slack-border bg-white shadow-lg py-1">
+                <div className="absolute right-0 top-7 z-50 min-w-[160px] rounded-lg border border-slack-border dark:border-[#3d3f42] bg-white dark:bg-[#222529] shadow-lg py-1">
                   <Button
                     variant="menu-item-danger"
                     onClick={handleLeaveChannel}

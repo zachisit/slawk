@@ -34,7 +34,7 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex h-dvh w-screen overflow-hidden bg-white">
+    <div className="flex h-dvh w-screen overflow-hidden bg-white dark:bg-[#1a1d21]">
       {/* Mobile sidebar overlay backdrop */}
       {sidebarOpen && (
         <div
@@ -56,7 +56,7 @@ export function AppLayout() {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex flex-1 flex-col min-w-0 min-h-0 overflow-hidden border-l border-slack-border">
+      <main className="flex flex-1 flex-col min-w-0 min-h-0 overflow-hidden border-l border-slack-border dark:border-[#3d3f42]">
         {content}
       </main>
 

@@ -2,7 +2,7 @@
 
 /* Force light mode — app does not support dark mode */
 :root {
-  color-scheme: light only;
+  color-scheme: light dark;
 }
 
 /* Lato font - Slack uses Slack-Lato which is based on Lato */
@@ -92,6 +92,35 @@
   --color-slack-file-image: #1264A3;
   --color-slack-file-pdf: #D72B3F;
   --color-slack-file-archive: #9B870C;
+}
+
+/* Dark mode overrides */
+.dark {
+  color-scheme: dark;
+  --color-slack-primary: #d1d2d3;
+  --color-slack-secondary: #ababad;
+  --color-slack-hover: #27292d;
+  --color-slack-active-tab: #1a1d21;
+  --color-slack-pinned: #2c2a1e;
+  --color-slack-success: #1a2e22;
+  --color-slack-highlight: #1a2633;
+  --color-slack-code-bg: rgba(255, 255, 255, 0.08);
+  --color-slack-border: #3d3f42;
+  --color-slack-border-light: rgba(255, 255, 255, 0.1);
+  --color-slack-border-dark: rgba(255, 255, 255, 0.2);
+  --color-slack-link: #4a9ed6;
+  --color-slack-link-hover: #6ab4e8;
+  --color-slack-muted: #ababad;
+  --color-slack-hint: #7a7b7c;
+  --color-slack-disabled: #5a5b5c;
+  --color-slack-input-border: #4a4c4f;
+  --color-slack-error-bg: #2c1a1e;
+  --color-slack-error-border: #5c2a30;
+}
+
+.dark body {
+  background-color: #1a1d21;
+  color: #d1d2d3;
 }
 
 /* Non-color design tokens */

@@ -10,6 +10,7 @@ import { useHuddleStore, setHuddleUserId } from '@/stores/useHuddleStore';
 import { HuddleBar } from '@/components/Huddle/HuddleBar';
 import { HuddleIncomingCall } from '@/components/Huddle/HuddleIncomingCall';
 import { AppLayout } from '@/components/Layout/AppLayout';
+import { useDarkMode } from '@/hooks/useDarkMode';
 import { LoginPage } from '@/components/Auth/LoginPage';
 import { RegisterPage } from '@/components/Auth/RegisterPage';
 
@@ -410,6 +411,7 @@ function AppShell() {
 
 function App() {
   const hydrate = useAuthStore((s) => s.hydrate);
+  useDarkMode();
 
   useEffect(() => {
     hydrate();
