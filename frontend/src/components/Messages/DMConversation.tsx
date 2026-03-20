@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { format, isToday, isYesterday } from 'date-fns';
 import {
   Pin,
@@ -188,10 +188,27 @@ export function DMConversation({ userId, userName, userAvatar }: DMConversationP
     updateReplyCount(messageId, userId, count, participant);
   }, [updateReplyCount, userId, currentUser]);
 
+  // Stabilize onSend callback to prevent MessageInput re-renders
+  const handleSendDM = useCallback(
+    async (content: string, fileIds?: number[]) => {
+      await storeSendMessage(userId, content, fileIds);
+    },
+    [userId, storeSendMessage]
+  );
+
   // Close thread panel when switching conversations
   useEffect(() => {
     setActiveThreadId(null);
   }, [userId]);
+
+  // Memoize dmParticipantIds to prevent MessageInput re-renders
+  const dmParticipantIds = useMemo(
+    () => (currentUser ? [currentUser.id, userId] : [userId]),
+    [currentUser?.id, userId]
+  );
+
+  // Memoize placeholder to prevent MessageInput re-renders
+  const placeholder = useMemo(() => `Message ${userName}`, [userName]);
 
   return (
     <div data-testid="dm-conversation" className="flex h-full flex-col">
@@ -525,11 +542,11 @@ export function DMConversation({ userId, userName, userAvatar }: DMConversationP
 
           {/* Input */}
           <MessageInput
-            placeholder={`Message ${userName}`}
-            onSend={async (content, fileIds) => { await storeSendMessage(userId, content, fileIds); }}
+            placeholder={placeholder}
+            onSend={handleSendDM}
             sendError={sendError}
             clearSendError={clearSendError}
-            dmParticipantIds={currentUser ? [currentUser.id, userId] : [userId]}
+            dmParticipantIds={dmParticipantIds}
             testIdPrefix="dm"
           />
         </div>

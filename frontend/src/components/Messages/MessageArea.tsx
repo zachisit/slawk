@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Hash, Menu } from 'lucide-react';
 import { useMobileStore } from '@/stores/useMobileStore';
 import { useChannelStore } from '@/stores/useChannelStore';
@@ -49,6 +49,22 @@ export function MessageArea() {
       ),
     }));
   }, []);
+
+  // Stabilize onSend callback to prevent MessageInput re-renders
+  const handleSendMessage = useCallback(
+    async (content: string, fileIds?: number[]) => {
+      if (activeChannelId) {
+        await sendMessage(activeChannelId, content, fileIds);
+      }
+    },
+    [activeChannelId, sendMessage]
+  );
+
+  // Memoize placeholder to prevent MessageInput re-renders
+  const placeholder = useMemo(
+    () => (activeChannel ? `Message #${activeChannel.name}` : ''),
+    [activeChannel?.name]
+  );
 
   // Show DM conversation if a DM is active
   if (activeDMId && activeDM) {
@@ -121,8 +137,8 @@ export function MessageArea() {
           </div>
         ) : (
           <MessageInput
-            placeholder={`Message #${activeChannel.name}`}
-            onSend={(content, fileIds) => sendMessage(activeChannelId!, content, fileIds)}
+            placeholder={placeholder}
+            onSend={handleSendMessage}
             sendError={sendError}
             clearSendError={clearSendError}
             channelId={activeChannelId!}
