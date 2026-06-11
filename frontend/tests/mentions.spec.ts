@@ -94,35 +94,34 @@ test.describe('@Mentions', () => {
     await expect(page1.getByTestId('mention-dropdown').getByText(target2Name)).toBeVisible({ timeout: 3000 });
     await page1.getByTestId('mention-dropdown').getByText(target2Name).click();
 
-    // Capture the raw editor text before sending — must contain exactly the two mention
-    // names and no stray suffix fragments (e.g. no trailing "rUser..." from the query)
-    const rawEditorText = await editor.textContent() ?? '';
-    // The embed nodes render as @Name in the DOM — verify no leftover query fragments
-    const target2Suffix = target2Name.slice(9); // characters after what we typed
-    // The characters we DID type should appear as part of the embed, not duplicated loose
-    const typedQueryChars = target2Name.slice(0, 9);
-    // There should be exactly one occurrence of target2Name embedded (not two)
-    const occurrences = (rawEditorText.match(new RegExp(target2Name, 'g')) || []).length;
-    expect(occurrences).toBe(1);
-
-    // Send the message
-    await page1.keyboard.press('Enter');
-
-    // Both mentions should appear styled in the sent message
-    const messageRow = page1.locator('.group.relative.flex.px-5').filter({ hasText: target1Name }).first();
-    await expect(messageRow).toBeVisible({ timeout: 10000 });
-    await expect(messageRow.locator('.ql-mention', { hasText: `@${target1Name}` })).toBeVisible();
-    await expect(messageRow.locator('.ql-mention', { hasText: `@${target2Name}` })).toBeVisible();
-
-    // Critically: no stale text fragment from the second query should appear as plain text
-    // The message text node (outside .ql-mention spans) should only contain " and "
-    const plainText = await messageRow.evaluate((el) => {
+    // Pre-send: verify no stale query fragment remains as loose text in the editor.
+    // Strip .ql-mention embed spans (which render as @Name) — what's left should be
+    // only the connective text " and ". Any stale suffix from the bug would appear here.
+    const editorPlainText = await editor.evaluate((el) => {
       const cloned = el.cloneNode(true) as HTMLElement;
       cloned.querySelectorAll('.ql-mention').forEach((m) => m.remove());
       return cloned.textContent ?? '';
     });
-    // Plain text outside mentions should be " and " (with surrounding whitespace) — no name fragments
-    expect(plainText.trim()).toBe('and');
+    expect(editorPlainText.trim()).toBe('and');
+
+    // Send the message
+    await page1.keyboard.press('Enter');
+
+    // Both mentions should appear styled in the sent message.
+    // Sent messages are re-rendered from wire format — mentions use .mention-highlight (not .ql-mention).
+    const messageRow = page1.locator('.group.relative.flex.px-5').filter({ hasText: target1Name }).first();
+    await expect(messageRow).toBeVisible({ timeout: 10000 });
+    await expect(messageRow.locator('.mention-highlight', { hasText: `@${target1Name}` })).toBeVisible();
+    await expect(messageRow.locator('.mention-highlight', { hasText: `@${target2Name}` })).toBeVisible();
+
+    // Verify no stale text fragment appears as plain text in the message body.
+    // Scoped to [data-testid="message-content"] to exclude sender name / timestamp from the row.
+    const sentPlainText = await messageRow.locator('[data-testid="message-content"]').evaluate((el) => {
+      const cloned = el.cloneNode(true) as HTMLElement;
+      cloned.querySelectorAll('.mention-highlight').forEach((m) => m.remove());
+      return cloned.textContent ?? '';
+    });
+    expect(sentPlainText.trim()).toBe('and');
 
     await ctx1.close();
     await ctx2.close();
