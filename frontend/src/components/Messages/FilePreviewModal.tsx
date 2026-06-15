@@ -95,7 +95,8 @@ export function FilePreviewModal({ fileId, fileName, fileSize, mimetype, onClose
             <a
               href={downloadUrl}
               download={fileName.replace(/[/\\:\0]/g, '_')}
-              rel="noopener"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-1 rounded px-2 py-1 text-[13px] text-slack-secondary hover:bg-slack-hover"
             >
               <Download className="h-4 w-4" />
