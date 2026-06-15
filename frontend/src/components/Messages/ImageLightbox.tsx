@@ -17,15 +17,21 @@ export function ImageLightbox({ src, alt, onClose }: ImageLightboxProps) {
   }, [onClose]);
 
   return (
+    // cursor-pointer makes iOS Safari fire the tap-to-close click on this backdrop div.
     <div
       data-testid="image-lightbox"
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80"
+      className="fixed inset-0 z-[9999] flex cursor-pointer items-center justify-center bg-black/80"
       onClick={onClose}
     >
       <button
         data-testid="lightbox-close"
         onClick={onClose}
-        className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
+        // Offset by the safe-area inset so the button isn't hidden under the iOS status bar/notch in a standalone PWA.
+        style={{
+          top: 'calc(env(safe-area-inset-top, 0px) + 1rem)',
+          right: 'calc(env(safe-area-inset-right, 0px) + 1rem)',
+        }}
+        className="absolute z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
         aria-label="Close"
       >
         <X className="h-5 w-5" />
