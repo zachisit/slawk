@@ -76,12 +76,18 @@ export function FilePreviewModal({ fileId, fileName, fileSize, mimetype, onClose
   }, [fileUrl, isText]);
 
   return (
+    // cursor-pointer makes iOS Safari fire the tap-to-close click on this backdrop div.
+    // Safe-area padding keeps the modal (and its close button) clear of the iOS status bar/notch.
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80"
+      className="fixed inset-0 z-[9999] flex cursor-pointer items-center justify-center bg-black/80"
+      style={{
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 1rem)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
+      }}
       onClick={onClose}
     >
       <div
-        className="relative flex flex-col bg-white rounded-lg shadow-2xl max-w-[90vw] max-h-[90vh] w-[800px]"
+        className="relative flex flex-col bg-white rounded-lg shadow-2xl max-w-[90vw] max-h-full w-[800px] cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
