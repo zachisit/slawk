@@ -141,6 +141,9 @@ export function useQuillEditor({
   filteredEmojisRef.current = filteredEmojis;
   const emojiSelectedIndexRef = useRef(emojiSelectedIndex);
   emojiSelectedIndexRef.current = emojiSelectedIndex;
+  // Ref so insertEmojiFromAutocomplete always reads the latest start index regardless of render batching
+  const emojiStartIndexRef = useRef<number | null>(emojiStartIndex);
+  emojiStartIndexRef.current = emojiStartIndex;
   const insertMentionRef = useRef<(user: AuthUser) => void>(() => {});
   const insertEmojiAutocompleteRef = useRef<(emoji: EmojiOption) => void>(() => {});
 
@@ -514,6 +517,10 @@ export function useQuillEditor({
     quill.root.addEventListener('drop', handleDrop as any);
 
     quillRef.current = quill;
+    // Expose the active editor for e2e tests (mirrors window.__socket). DEV/E2E only.
+    if (import.meta.env.DEV || import.meta.env.VITE_E2E) {
+      (window as any).__quill = quill;
+    }
   }, [placeholder, testId, enableInlineCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update placeholder when it changes
@@ -601,17 +608,25 @@ export function useQuillEditor({
   const insertEmojiFromAutocomplete = useCallback(
     (emoji: EmojiOption) => {
       const quill = quillRef.current;
-      if (!quill || emojiStartIndex === null) return;
-      const deleteLength = emojiQuery.length + 1; // +1 for the leading ':'
-      quill.deleteText(emojiStartIndex, deleteLength);
-      quill.insertText(emojiStartIndex, emoji.native);
-      quill.setSelection(emojiStartIndex + emoji.native.length);
+      // Read from ref so we always get the latest value even if React batched the state update
+      const startIndex = emojiStartIndexRef.current;
+      if (!quill || startIndex === null) return;
+      // Derive deleteLength from the actual cursor position rather than emojiQuery state,
+      // which can be stale when the user types quickly and React batches updates. The cursor
+      // sits right after the last typed character of the ':query', so the span to remove is
+      // everything from the leading ':' up to the cursor (covers the ':' plus the shortcode).
+      const sel = quill.getSelection();
+      const deleteLength = sel ? sel.index - startIndex : 0;
+      if (deleteLength <= 0) return;
+      quill.deleteText(startIndex, deleteLength);
+      quill.insertText(startIndex, emoji.native);
+      quill.setSelection(startIndex + emoji.native.length);
       setShowEmojiAutocomplete(false);
       setEmojiQuery('');
       setEmojiStartIndex(null);
       quill.focus();
     },
-    [emojiStartIndex, emojiQuery],
+    [],
   );
   insertEmojiAutocompleteRef.current = insertEmojiFromAutocomplete;
 
