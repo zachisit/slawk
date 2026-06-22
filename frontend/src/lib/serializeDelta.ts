@@ -80,11 +80,6 @@ export function serializeDelta(quill: Quill): string {
       pendingText = '';
       orderedIndex = 0;
     } else {
-      if (pendingText) {
-        if (inCodeBlock) flushCodeBlock();
-        result += pendingText;
-        pendingText = '';
-      }
       if (inCodeBlock) flushCodeBlock();
 
       if (attrs['code']) {
@@ -92,7 +87,8 @@ export function serializeDelta(quill: Quill): string {
       } else {
         const formatted = applyInlineFormat(text, attrs);
         if (formatted.endsWith('\n') || formatted === '\n') {
-          result += formatted;
+          result += pendingText + formatted;
+          pendingText = '';
           orderedIndex = 0;
         } else {
           pendingText += formatted;
